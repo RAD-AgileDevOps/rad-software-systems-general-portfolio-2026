@@ -2,6 +2,14 @@
 <h2>The Sovereign Architecture Lab</h2>
 This repository serves as a centralized hub for RAD Software Systems' technical DNA. It is a curated collection of production-grade demos, rapid prototypes, and architectural Proof of Concepts (PoCs) designed to demonstrate the intersection of high-performance logic and seamless user experience.
 
+<h2>Other Relevant Repositories</h2>
+<ol>
+    <li><a href="https://github.com/RAD-AgileDevOps/automotive-dashboard-prototype-excel-reporting#">Automotive Dashboard - Excel Reporting</a></li>
+    <li><a href="https://github.com/RAD-AgileDevOps/reactive-event-log">Reactive Event Log</a></li>
+ <li><a href="https://github.com/RAD-AgileDevOps/vilt-pomodoro-timer-project">Pomodoro Timer</a></li>
+</ol>
+
+
 <h2>🛠 Tech Stack & Core Competencies</h2>
 We specialize in the VILT Stack (Vue, Inertia, Laravel, Tailwind) and robust backend engineering. This repo showcases our mastery in:
 
@@ -25,10 +33,3 @@ For stakeholders looking to explore what RAD Software Systems offers:
 Each artifact here is built with a focus on Sovereignty—giving the client total control over their data and logic without the "spurious tactics" or bloat found in off-the-shelf solutions.
 
 "We don't just write code; we architect systems that survive the real world."
-
-<h2>Other Relevant Repositories</h2>
-<ol>
-    <li><a href="https://github.com/RAD-AgileDevOps/automotive-dashboard-prototype-excel-reporting#">Automotive Dashboard - Excel Reporting</a></li>
-    <li><a href="https://github.com/RAD-AgileDevOps/reactive-event-log">Reactive Event Log</a></li>
- <li><a href="https://github.com/RAD-AgileDevOps/vilt-pomodoro-timer-project">Pomodoro Timer</a></li>
-</ol>
