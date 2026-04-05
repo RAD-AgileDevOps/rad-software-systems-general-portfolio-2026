@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DataSync Dashboard — VILT Stack Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --bg: #0e0f14;
+    --bg2: #14151c;
+    --bg3: #1c1e28;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --amber: #f0a500;
+    --amber2: #ffd166;
+    --amber-dim: rgba(240,165,0,0.12);
+    --text: #e8e9f0;
+    --text2: #8a8d9e;
+    --text3: #555870;
+    --green: #3dd68c;
+    --green-dim: rgba(61,214,140,0.1);
+    --red: #ff6b6b;
+    --red-dim: rgba(255,107,107,0.1);
+    --blue: #5b8dee;
+    --blue-dim: rgba(91,141,238,0.1);
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 14px; min-height: 100vh; display: flex; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 220px; min-height: 100vh; background: var(--bg2);
+    border-right: 1px solid var(--border); padding: 24px 0;
+    display: flex; flex-direction: column; flex-shrink: 0; position: sticky; top: 0; height: 100vh;
+  }
+  .logo { padding: 0 20px 28px; display: flex; align-items: center; gap: 10px; }
+  .logo-mark { width: 32px; height: 32px; background: var(--amber); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .logo-mark svg { width: 18px; height: 18px; }
+  .logo-text { font-family: var(--font-head); font-size: 15px; font-weight: 700; letter-spacing: 0.03em; color: var(--text); }
+  .logo-text span { color: var(--amber); }
+  .nav-section { padding: 0 12px; margin-bottom: 4px; }
+  .nav-label { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); padding: 0 8px 8px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius); cursor: pointer; color: var(--text2); font-size: 13.5px; margin-bottom: 2px; transition: all 0.15s; }
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+  .nav-item.active { background: var(--amber-dim); color: var(--amber); }
+  .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .nav-badge { margin-left: auto; background: var(--amber-dim); color: var(--amber); font-size: 10px; font-family: var(--font-mono); padding: 2px 6px; border-radius: 4px; }
+  .sidebar-footer { margin-top: auto; padding: 20px 12px 0; border-top: 1px solid var(--border); }
+
+  /* MAIN */
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 28px; height: 58px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; color: var(--text); }
+  .topbar-breadcrumb { font-size: 12px; color: var(--text3); font-family: var(--font-mono); }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .status-pill { display: flex; align-items: center; gap: 6px; background: var(--green-dim); color: var(--green); font-size: 12px; font-family: var(--font-mono); padding: 5px 10px; border-radius: 20px; border: 1px solid rgba(61,214,140,0.2); }
+  .pulse { width: 7px; height: 7px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+  .avatar { width: 32px; height: 32px; background: var(--amber-dim); border: 1px solid rgba(240,165,0,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--amber); font-family: var(--font-mono); }
+
+  .content { padding: 28px; flex: 1; }
+
+  /* METRIC CARDS */
+  .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .metric-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; position: relative; overflow: hidden; }
+  .metric-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+  .metric-card.amber::after { background: linear-gradient(90deg, var(--amber), transparent); }
+  .metric-card.green::after { background: linear-gradient(90deg, var(--green), transparent); }
+  .metric-card.blue::after { background: linear-gradient(90deg, var(--blue), transparent); }
+  .metric-card.red::after { background: linear-gradient(90deg, var(--red), transparent); }
+  .metric-label { font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 8px; }
+  .metric-value { font-family: var(--font-head); font-size: 28px; font-weight: 800; color: var(--text); line-height: 1; margin-bottom: 8px; }
+  .metric-sub { font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 4px; }
+  .metric-change { font-family: var(--font-mono); font-size: 11px; }
+  .metric-change.up { color: var(--green); }
+  .metric-change.down { color: var(--red); }
+
+  /* SECTION HEADER */
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .section-title { font-family: var(--font-head); font-size: 15px; font-weight: 700; color: var(--text); }
+  .section-sub { font-size: 12px; color: var(--text3); font-family: var(--font-mono); }
+
+  /* CARDS */
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+  .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .card-body { padding: 20px; }
+
+  /* GRID LAYOUT */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+  .full-col { margin-bottom: 24px; }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: all 0.15s; font-family: var(--font-body); }
+  .btn-primary { background: var(--amber); color: #0e0f14; }
+  .btn-primary:hover { background: var(--amber2); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border2); }
+  .btn-ghost:hover { background: var(--bg3); color: var(--text); }
+  .btn-danger { background: var(--red-dim); color: var(--red); border: 1px solid rgba(255,107,107,0.2); }
+  .btn-danger:hover { background: rgba(255,107,107,0.2); }
+  .btn-success { background: var(--green-dim); color: var(--green); border: 1px solid rgba(61,214,140,0.2); }
+  .btn-success:hover { background: rgba(61,214,140,0.2); }
+  .btn svg { width: 14px; height: 14px; }
+
+  /* ENDPOINT SELECTOR */
+  .endpoint-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .endpoint-chip { padding: 7px 14px; border-radius: 20px; font-size: 12px; font-family: var(--font-mono); cursor: pointer; border: 1px solid var(--border2); background: transparent; color: var(--text2); transition: all 0.15s; }
+  .endpoint-chip.active { background: var(--amber-dim); color: var(--amber); border-color: rgba(240,165,0,0.3); }
+  .endpoint-chip:hover:not(.active) { background: var(--bg3); color: var(--text); }
+  .url-display { display: flex; align-items: center; gap: 8px; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; font-family: var(--font-mono); font-size: 12px; color: var(--text3); flex: 1; }
+  .url-method { background: var(--amber-dim); color: var(--amber); padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 600; letter-spacing: 0.05em; }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); padding: 8px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text2); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .td-id { font-family: var(--font-mono); font-size: 11px; color: var(--text3); }
+  .td-title { color: var(--text); max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .td-body { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* BADGES */
+  .badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-family: var(--font-mono); }
+  .badge-stored { background: var(--green-dim); color: var(--green); }
+  .badge-pending { background: var(--amber-dim); color: var(--amber); }
+  .badge-error { background: var(--red-dim); color: var(--red); }
+
+  /* STORAGE PANEL */
+  .storage-list { display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; }
+  .storage-item { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px; }
+  .storage-icon { width: 28px; height: 28px; background: var(--amber-dim); border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .storage-icon svg { width: 14px; height: 14px; color: var(--amber); }
+  .storage-meta { font-size: 11px; color: var(--text3); font-family: var(--font-mono); }
+  .storage-title { font-size: 12.5px; color: var(--text); margin-bottom: 2px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 240px; }
+  .storage-actions { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+
+  /* LOG */
+  .log-panel { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px; font-family: var(--font-mono); font-size: 11.5px; max-height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+  .log-line { display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
+  .log-time { color: var(--text3); flex-shrink: 0; }
+  .log-info { color: var(--blue); }
+  .log-success { color: var(--green); }
+  .log-warn { color: var(--amber); }
+  .log-error { color: var(--red); }
+
+  /* LOADER */
+  .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.1); border-top-color: var(--amber); border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .fetch-state { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text3); padding: 8px 0; }
+
+  /* TOAST */
+  .toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 1000; }
+  .toast { background: var(--bg2); border: 1px solid var(--border2); border-radius: 10px; padding: 12px 16px; font-size: 13px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); animation: slideIn 0.25s ease; min-width: 260px; }
+  @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  .toast.success .toast-dot { background: var(--green); }
+  .toast.warn .toast-dot { background: var(--amber); }
+  .toast.error .toast-dot { background: var(--red); }
+  .toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+  /* EMPTY STATE */
+  .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; color: var(--text3); gap: 10px; }
+  .empty svg { width: 32px; height: 32px; opacity: 0.4; }
+  .empty p { font-size: 13px; }
+
+  /* SEARCH */
+  .search-input { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px 7px 32px; font-size: 13px; color: var(--text); font-family: var(--font-body); outline: none; width: 220px; transition: border 0.15s; }
+  .search-input:focus { border-color: var(--border2); }
+  .search-wrap { position: relative; }
+  .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text3); }
+
+  /* PAGINATION */
+  .pagination { display: flex; align-items: center; gap: 6px; }
+  .page-btn { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-family: var(--font-mono); cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--text2); transition: all 0.15s; }
+  .page-btn.active { background: var(--amber-dim); color: var(--amber); border-color: rgba(240,165,0,0.3); }
+  .page-btn:hover:not(.active) { background: var(--bg3); }
+
+  /* CHART CONTAINER */
+  .chart-container { position: relative; height: 220px; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 4px; background: var(--bg); border-radius: 8px; padding: 4px; }
+  .tab { padding: 6px 14px; border-radius: 6px; font-size: 12.5px; cursor: pointer; color: var(--text2); transition: all 0.15s; border: none; background: transparent; font-family: var(--font-body); }
+  .tab.active { background: var(--bg2); color: var(--text); border: 1px solid var(--border); }
+
+  /* PROGRESS */
+  .progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
+
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .metrics-grid { grid-template-columns: repeat(2,1fr); }
+    .two-col { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="6" height="6" rx="1.5" fill="#0e0f14"/>
+        <rect x="10" y="2" width="6" height="6" rx="1.5" fill="#0e0f14"/>
+        <rect x="2" y="10" width="6" height="6" rx="1.5" fill="#0e0f14"/>
+        <circle cx="13" cy="13" r="3" fill="#0e0f14"/>
+      </svg>
+    </div>
+    <div class="logo-text">Data<span>Sync</span></div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Main</div>
+    <div class="nav-item active">
+      <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor" opacity=".8"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor" opacity=".8"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor" opacity=".8"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor" opacity=".5"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      API Explorer
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Sync History
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M8 2v4l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M3.5 12.5A6 6 0 1 1 14 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Scheduled Jobs
+      <span class="nav-badge">3</span>
+    </div>
+  </div>
+  <div class="nav-section" style="margin-top:16px;">
+    <div class="nav-label">Storage</div>
+    <div class="nav-item">
+      <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="3" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="8" width="12" height="3" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M11 4.5h1M11 9.5h1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Internal DB
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M3 4l5 4 5-4M3 8l5 4 5-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Data Mapper
+    </div>
+  </div>
+  <div class="nav-section" style="margin-top:16px;">
+    <div class="nav-label">Config</div>
+    <div class="nav-item">
+      <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.42 1.42M11.54 11.54l1.41 1.41M3.05 12.95l1.42-1.42M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Settings
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="nav-item" style="padding: 8px 10px;">
+      <div class="avatar">AD</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12.5px;color:var(--text);font-weight:500;">Admin</div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);">admin@datasync.io</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="topbar">
+    <div>
+      <div class="topbar-title">Dashboard</div>
+      <div class="topbar-breadcrumb">datasync / overview</div>
+    </div>
+    <div class="topbar-right">
+      <div class="status-pill">
+        <div class="pulse"></div>
+        API Connected
+      </div>
+      <button class="btn btn-primary" onclick="fetchData()" id="fetchBtn">
+        <svg viewBox="0 0 14 14" fill="none"><path d="M7 1v6M4 4l3-3 3 3M2 10h10M2 12h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Fetch Data
+      </button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- METRICS -->
+    <div class="metrics-grid">
+      <div class="metric-card amber">
+        <div class="metric-label">Total Fetched</div>
+        <div class="metric-value" id="m-fetched">0</div>
+        <div class="metric-sub"><span class="metric-change up" id="m-fetched-sub">— Run a fetch</span></div>
+      </div>
+      <div class="metric-card green">
+        <div class="metric-label">Stored Records</div>
+        <div class="metric-value" id="m-stored">0</div>
+        <div class="metric-sub"><span class="metric-change up" id="m-stored-sub">In internal DB</span></div>
+      </div>
+      <div class="metric-card blue">
+        <div class="metric-label">API Requests</div>
+        <div class="metric-value" id="m-requests">0</div>
+        <div class="metric-sub"><span id="m-request-sub" style="color:var(--text3)">Since session start</span></div>
+      </div>
+      <div class="metric-card red">
+        <div class="metric-label">Pending / Errors</div>
+        <div class="metric-value" id="m-errors">0</div>
+        <div class="metric-sub"><span class="metric-change" id="m-errors-sub" style="color:var(--text3)">No errors</span></div>
+      </div>
+    </div>
+
+    <!-- API CONTROL -->
+    <div class="full-col">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="section-title">API Integration</div>
+            <div class="section-sub">JSONPlaceholder REST API · laravel/http-client</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost" onclick="clearFetched()">
+              <svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Clear
+            </button>
+            <button class="btn btn-success" onclick="storeAll()" id="storeAllBtn" style="display:none;">
+              <svg viewBox="0 0 14 14" fill="none"><path d="M2 4h10v8H2zM4 4V2h6v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 9l2 2 2-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Store All
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- ENDPOINT PICKER -->
+          <div class="endpoint-bar">
+            <button class="endpoint-chip active" onclick="setEndpoint('posts')" data-ep="posts">/posts</button>
+            <button class="endpoint-chip" onclick="setEndpoint('users')" data-ep="users">/users</button>
+            <button class="endpoint-chip" onclick="setEndpoint('todos')" data-ep="todos">/todos</button>
+            <button class="endpoint-chip" onclick="setEndpoint('comments')" data-ep="comments">/comments</button>
+            <div class="url-display">
+              <span class="url-method">GET</span>
+              <span id="urlDisplay">https://jsonplaceholder.typicode.com/posts</span>
+            </div>
+          </div>
+
+          <!-- FETCH STATE -->
+          <div id="fetchState" class="fetch-state" style="display:none;">
+            <div class="spinner"></div>
+            <span id="fetchStateMsg">Fetching from API...</span>
+          </div>
+
+          <!-- TABLE -->
+          <div class="table-wrap" id="tableWrap" style="display:none;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <div class="search-wrap">
+                <svg class="search-icon" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <input class="search-input" type="text" placeholder="Filter records..." id="searchInput" oninput="filterTable()"/>
+              </div>
+              <div style="font-size:12px;color:var(--text3);font-family:var(--font-mono);" id="tableCount"></div>
+            </div>
+            <table id="dataTable">
+              <thead id="tableHead"></thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;">
+              <div style="font-size:12px;color:var(--text3);">Showing <span id="showingCount">0</span> records</div>
+              <div class="pagination" id="pagination"></div>
+            </div>
+          </div>
+          <div id="tableEmpty" class="empty">
+            <svg viewBox="0 0 32 32" fill="none"><rect x="4" y="6" width="24" height="20" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M4 11h24M10 16h12M10 21h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <p>Click "Fetch Data" to load records from the API</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARTS + STORAGE -->
+    <div class="two-col">
+      <!-- CHART CARD -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="section-title">Data Overview</div>
+            <div class="section-sub">Fetch & storage activity</div>
+          </div>
+          <div class="tabs" id="chartTabs">
+            <button class="tab active" onclick="switchChart('bar')">Bar</button>
+            <button class="tab" onclick="switchChart('doughnut')">Donut</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="chart-container">
+            <canvas id="mainChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- STORAGE PANEL -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="section-title">Internal Storage</div>
+            <div class="section-sub">Session DB · <span id="storageCount" style="color:var(--amber);">0 records</span></div>
+          </div>
+          <button class="btn btn-ghost" onclick="clearStorage()" style="font-size:12px;">Clear DB</button>
+        </div>
+        <div class="card-body" style="padding: 14px 16px;">
+          <div class="storage-list" id="storageList">
+            <div class="empty" id="storageEmpty">
+              <svg viewBox="0 0 32 32" fill="none"><rect x="4" y="8" width="24" height="6" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="4" y="18" width="24" height="6" rx="2" stroke="currentColor" stroke-width="1.5" opacity=".5"/><path d="M23 11h1M23 21h1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <p>No records stored yet</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY LOG -->
+    <div class="full-col">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="section-title">Activity Log</div>
+            <div class="section-sub">Laravel log · real-time</div>
+          </div>
+          <button class="btn btn-ghost" onclick="clearLog()" style="font-size:12px;">Clear</button>
+        </div>
+        <div class="card-body" style="padding:14px 16px;">
+          <!-- STORAGE PROGRESS -->
+          <div style="display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:160px;">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px;">
+                <span>Storage Usage</span><span id="storageUsage">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="storageBar" style="width:0%;background:var(--amber);"></div>
+              </div>
+            </div>
+            <div style="flex:1;min-width:160px;">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px;">
+                <span>API Success Rate</span><span id="successRate">—</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="successBar" style="width:0%;background:var(--green);"></div>
+              </div>
+            </div>
+            <div style="flex:1;min-width:160px;">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px;">
+                <span>Sync Rate</span><span id="syncRate">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="syncBar" style="width:0%;background:var(--blue);"></div>
+              </div>
+            </div>
+          </div>
+          <div class="log-panel" id="logPanel">
+            <div class="log-line"><span class="log-time">00:00:00</span><span class="log-info">[INFO]</span><span style="color:var(--text3);">DataSync session initialized — VILT Stack v1.0</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+  const API_BASE = 'https://jsonplaceholder.typicode.com';
+  let state = {
+    currentEndpoint: 'posts',
+    fetchedData: [],
+    storedData: [],
+    apiRequests: 0,
+    apiErrors: 0,
+    page: 1,
+    perPage: 8,
+    filter: '',
+    chartType: 'bar',
+    chart: null,
+    fetchHistory: { posts:0, users:0, todos:0, comments:0 },
+    storeHistory: { posts:0, users:0, todos:0, comments:0 },
+  };
+
+  function now() {
+    return new Date().toLocaleTimeString('en-US', {hour12:false});
+  }
+
+  function log(msg, type='info') {
+    const panel = document.getElementById('logPanel');
+    const div = document.createElement('div');
+    div.className = 'log-line';
+    div.innerHTML = `<span class="log-time">${now()}</span><span class="log-${type}">[${type.toUpperCase()}]</span><span style="color:var(--text2);">${msg}</span>`;
+    panel.appendChild(div);
+    panel.scrollTop = panel.scrollHeight;
+  }
+
+  function toast(msg, type='success') {
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `<div class="toast-dot"></div><span>${msg}</span>`;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3200);
+  }
+
+  function setEndpoint(ep) {
+    state.currentEndpoint = ep;
+    document.querySelectorAll('.endpoint-chip').forEach(c => {
+      c.classList.toggle('active', c.dataset.ep === ep);
+    });
+    document.getElementById('urlDisplay').textContent = `${API_BASE}/${ep}`;
+    log(`Endpoint switched to /${ep}`, 'info');
+  }
+
+  async function fetchData() {
+    const btn = document.getElementById('fetchBtn');
+    btn.disabled = true;
+    btn.innerHTML = `<div class="spinner"></div> Fetching...`;
+    document.getElementById('fetchState').style.display = 'flex';
+    document.getElementById('fetchStateMsg').textContent = `Sending GET request to /${state.currentEndpoint}...`;
+    document.getElementById('tableWrap').style.display = 'none';
+    document.getElementById('tableEmpty').style.display = 'flex';
+    document.getElementById('storeAllBtn').style.display = 'none';
+
+    state.apiRequests++;
+    log(`GET ${API_BASE}/${state.currentEndpoint} — request #${state.apiRequests}`, 'info');
+
+    try {
+      const t0 = Date.now();
+      const res = await fetch(`${API_BASE}/${state.currentEndpoint}`);
+      const data = await res.json();
+      const ms = Date.now() - t0;
+
+      state.fetchedData = data;
+      state.page = 1;
+      state.filter = '';
+      document.getElementById('searchInput').value = '';
+      state.fetchHistory[state.currentEndpoint] = data.length;
+
+      log(`Response 200 OK — ${data.length} records in ${ms}ms`, 'success');
+      toast(`Fetched ${data.length} records from /${state.currentEndpoint}`, 'success');
+      updateMetrics();
+      renderTable();
+      updateChart();
+
+      document.getElementById('storeAllBtn').style.display = 'flex';
+      document.getElementById('successBar').style.width = '100%';
+      document.getElementById('successRate').textContent = '100%';
+    } catch (err) {
+      state.apiErrors++;
+      log(`Error: ${err.message}`, 'error');
+      toast(`Fetch failed: ${err.message}`, 'error');
+      updateMetrics();
+    }
+
+    document.getElementById('fetchState').style.display = 'none';
+    btn.disabled = false;
+    btn.innerHTML = `<svg viewBox="0 0 14 14" fill="none"><path d="M7 1v6M4 4l3-3 3 3M2 10h10M2 12h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Fetch Data`;
+  }
+
+  function getColumns(ep) {
+    const map = {
+      posts: ['id','userId','title','body'],
+      users: ['id','name','email','phone','website'],
+      todos: ['id','userId','title','completed'],
+      comments: ['id','postId','name','email','body'],
+    };
+    return map[ep] || Object.keys((state.fetchedData[0]||{}));
+  }
+
+  function filteredData() {
+    if (!state.filter) return state.fetchedData;
+    const q = state.filter.toLowerCase();
+    return state.fetchedData.filter(r =>
+      Object.values(r).some(v => String(v).toLowerCase().includes(q))
+    );
+  }
+
+  function renderTable() {
+    const cols = getColumns(state.currentEndpoint);
+    const data = filteredData();
+    const total = data.length;
+    const start = (state.page-1)*state.perPage;
+    const page = data.slice(start, start+state.perPage);
+
+    document.getElementById('tableHead').innerHTML =
+      `<tr>${cols.map(c=>`<th>${c}</th>`).join('')}<th>Status</th><th></th></tr>`;
+
+    document.getElementById('tableBody').innerHTML = page.map(row => {
+      const isStored = state.storedData.some(s => s._ep === state.currentEndpoint && s.id === row.id);
+      const cells = cols.map(c => {
+        const v = row[c];
+        if (c === 'id') return `<td class="td-id">#${v}</td>`;
+        if (c === 'completed') return `<td><span class="badge ${v?'badge-stored':'badge-pending'}">${v?'done':'pending'}</span></td>`;
+        if (c === 'title' || c === 'name') return `<td class="td-title">${v}</td>`;
+        return `<td class="td-body">${v??'—'}</td>`;
+      }).join('');
+      return `<tr>
+        ${cells}
+        <td><span class="badge ${isStored?'badge-stored':'badge-pending'}">${isStored?'stored':'pending'}</span></td>
+        <td><button class="btn ${isStored?'btn-ghost':'btn-success'}" style="padding:4px 10px;font-size:11px;" onclick="storeRecord(${row.id})">${isStored?'Stored ✓':'Store'}</button></td>
+      </tr>`;
+    }).join('');
+
+    document.getElementById('tableWrap').style.display = 'block';
+    document.getElementById('tableEmpty').style.display = 'none';
+    document.getElementById('showingCount').textContent = total;
+    document.getElementById('tableCount').textContent = `${total} records`;
+    renderPagination(total);
+  }
+
+  function renderPagination(total) {
+    const pages = Math.ceil(total / state.perPage);
+    const p = document.getElementById('pagination');
+    p.innerHTML = '';
+    for (let i=1; i<=Math.min(pages,6); i++) {
+      const btn = document.createElement('button');
+      btn.className = `page-btn ${i===state.page?'active':''}`;
+      btn.textContent = i;
+      btn.onclick = () => { state.page=i; renderTable(); };
+      p.appendChild(btn);
+    }
+    if (pages > 6) {
+      const span = document.createElement('span');
+      span.style.cssText = 'font-size:12px;color:var(--text3);padding:0 4px;';
+      span.textContent = `... ${pages}`;
+      p.appendChild(span);
+    }
+  }
+
+  function filterTable() {
+    state.filter = document.getElementById('searchInput').value;
+    state.page = 1;
+    renderTable();
+  }
+
+  function storeRecord(id) {
+    const row = state.fetchedData.find(r => r.id === id);
+    if (!row) return;
+    if (state.storedData.some(s => s._ep === state.currentEndpoint && s.id === id)) {
+      toast('Record already stored', 'warn'); return;
+    }
+    const record = { ...row, _ep: state.currentEndpoint, _storedAt: new Date().toISOString() };
+    state.storedData.push(record);
+    state.storeHistory[state.currentEndpoint]++;
+    log(`STORE ${state.currentEndpoint}#${id} → internal_db`, 'success');
+    toast(`Record #${id} stored successfully`, 'success');
+    renderTable();
+    renderStorage();
+    updateMetrics();
+    updateChart();
+  }
+
+  function storeAll() {
+    let count = 0;
+    state.fetchedData.forEach(row => {
+      if (!state.storedData.some(s => s._ep === state.currentEndpoint && s.id === row.id)) {
+        state.storedData.push({ ...row, _ep: state.currentEndpoint, _storedAt: new Date().toISOString() });
+        state.storeHistory[state.currentEndpoint]++;
+        count++;
+      }
+    });
+    log(`BULK STORE — ${count} records → internal_db`, 'success');
+    toast(`${count} records stored to internal DB`, 'success');
+    renderTable();
+    renderStorage();
+    updateMetrics();
+    updateChart();
+  }
+
+  function renderStorage() {
+    const list = document.getElementById('storageList');
+    const empty = document.getElementById('storageEmpty');
+    const stored = [...state.storedData].reverse().slice(0, 20);
+    document.getElementById('storageCount').textContent = `${state.storedData.length} records`;
+
+    if (stored.length === 0) { empty.style.display='flex'; return; }
+    empty.style.display = 'none';
+
+    const items = stored.map(r => {
+      const label = r.title || r.name || r.email || `Record #${r.id}`;
+      const epColor = {posts:'amber',users:'blue',todos:'green',comments:'red'}[r._ep]||'amber';
+      return `<div class="storage-item">
+        <div class="storage-icon"><svg viewBox="0 0 14 14" fill="none"><rect x="2" y="3" width="10" height="3" rx="1" stroke="var(--amber)" stroke-width="1.2"/><rect x="2" y="8" width="10" height="3" rx="1" stroke="var(--amber)" stroke-width="1.2"/><path d="M10 4.5h.5M10 9.5h.5" stroke="var(--amber)" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+        <div style="flex:1;min-width:0;">
+          <div class="storage-title">${label}</div>
+          <div class="storage-meta">${r._ep}#${r.id} · ${new Date(r._storedAt).toLocaleTimeString()}</div>
+        </div>
+        <div class="storage-actions">
+          <span class="badge badge-stored">${r._ep}</span>
+          <button class="btn btn-danger" style="padding:3px 8px;font-size:11px;" onclick="deleteRecord('${r._ep}',${r.id})">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    list.innerHTML = items + (empty.outerHTML);
+    document.getElementById('storageEmpty').style.display = 'none';
+  }
+
+  function deleteRecord(ep, id) {
+    state.storedData = state.storedData.filter(r => !(r._ep===ep && r.id===id));
+    state.storeHistory[ep] = Math.max(0, state.storeHistory[ep]-1);
+    log(`DELETE ${ep}#${id} from internal_db`, 'warn');
+    toast(`Record #${id} removed from storage`, 'warn');
+    renderStorage();
+    renderTable();
+    updateMetrics();
+    updateChart();
+  }
+
+  function clearStorage() {
+    state.storedData = [];
+    Object.keys(state.storeHistory).forEach(k => state.storeHistory[k]=0);
+    log('CLEAR internal_db — all records deleted', 'warn');
+    toast('Internal storage cleared', 'warn');
+    renderStorage();
+    renderTable();
+    updateMetrics();
+    updateChart();
+  }
+
+  function clearFetched() {
+    state.fetchedData = [];
+    state.filter = '';
+    document.getElementById('tableWrap').style.display = 'none';
+    document.getElementById('tableEmpty').style.display = 'flex';
+    document.getElementById('storeAllBtn').style.display = 'none';
+    log('Fetched data cleared from view', 'info');
+    updateMetrics();
+    updateChart();
+  }
+
+  function clearLog() {
+    document.getElementById('logPanel').innerHTML = '';
+    log('Log cleared', 'info');
+  }
+
+  function updateMetrics() {
+    document.getElementById('m-fetched').textContent = state.fetchedData.length;
+    document.getElementById('m-fetched-sub').textContent = state.fetchedData.length ? `From /${state.currentEndpoint}` : '— Run a fetch';
+    document.getElementById('m-stored').textContent = state.storedData.length;
+    document.getElementById('m-stored-sub').textContent = `${state.storedData.length} in DB`;
+    document.getElementById('m-requests').textContent = state.apiRequests;
+    document.getElementById('m-errors').textContent = state.apiErrors;
+    document.getElementById('m-errors-sub').textContent = state.apiErrors > 0 ? `${state.apiErrors} error(s)` : 'No errors';
+
+    const storagePct = Math.min(100, Math.round((state.storedData.length / 200)*100));
+    document.getElementById('storageUsage').textContent = `${storagePct}%`;
+    document.getElementById('storageBar').style.width = `${storagePct}%`;
+
+    const syncPct = state.fetchedData.length ? Math.round((state.storedData.filter(s=>s._ep===state.currentEndpoint).length / state.fetchedData.length)*100) : 0;
+    document.getElementById('syncRate').textContent = `${syncPct}%`;
+    document.getElementById('syncBar').style.width = `${syncPct}%`;
+  }
+
+  function initChart() {
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    state.chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Posts','Users','Todos','Comments'],
+        datasets: [
+          { label: 'Fetched', data: [0,0,0,0], backgroundColor: 'rgba(240,165,0,0.7)', borderRadius: 5 },
+          { label: 'Stored',  data: [0,0,0,0], backgroundColor: 'rgba(61,214,140,0.7)', borderRadius: 5 },
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#555870', font: { family: "'IBM Plex Mono'" } } },
+          y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#555870', font: { family: "'IBM Plex Mono'" } }, beginAtZero: true }
+        }
+      }
+    });
+  }
+
+  function updateChart() {
+    if (!state.chart) return;
+    const eps = ['posts','users','todos','comments'];
+    if (state.chartType === 'bar') {
+      state.chart.data.datasets[0].data = eps.map(e => state.fetchHistory[e]);
+      state.chart.data.datasets[1].data = eps.map(e => state.storeHistory[e]);
+      state.chart.data.labels = ['Posts','Users','Todos','Comments'];
+    } else {
+      const total = state.storedData.length;
+      if (!total) {
+        state.chart.data.datasets[0].data = [1,1,1,1];
+        state.chart.data.datasets[0].backgroundColor = ['rgba(255,255,255,0.05)','rgba(255,255,255,0.05)','rgba(255,255,255,0.05)','rgba(255,255,255,0.05)'];
+      } else {
+        state.chart.data.datasets[0].data = eps.map(e => state.storeHistory[e]||0);
+        state.chart.data.datasets[0].backgroundColor = ['rgba(240,165,0,0.8)','rgba(91,141,238,0.8)','rgba(61,214,140,0.8)','rgba(255,107,107,0.8)'];
+      }
+    }
+    state.chart.update();
+  }
+
+  function switchChart(type) {
+    state.chartType = type;
+    document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',(type==='bar'?i===0:i===1)));
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    state.chart.destroy();
+    const eps = ['posts','users','todos','comments'];
+    const total = state.storedData.length;
+    if (type === 'doughnut') {
+      state.chart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Posts','Users','Todos','Comments'],
+          datasets: [{ data: eps.map(e=>state.storeHistory[e]||(!total?1:0)), backgroundColor: ['rgba(240,165,0,0.8)','rgba(91,141,238,0.8)','rgba(61,214,140,0.8)','rgba(255,107,107,0.8)'], borderWidth: 0, hoverOffset: 6 }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false, cutout: '68%',
+          plugins: { legend: { display: false } }
+        }
+      });
+    } else {
+      initChart();
+      updateChart();
+    }
+  }
+
+  window.addEventListener('load', () => {
+    initChart();
+    log('Laravel HTTP Client ready · Inertia.js bridge loaded', 'info');
+    log('Vue 3 reactivity initialized · Tailwind CSS active', 'info');
+    log(`Connected to ${API_BASE}`, 'success');
+  });
+</script>
+</body>
+</html>
