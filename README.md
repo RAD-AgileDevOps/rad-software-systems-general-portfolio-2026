@@ -25,3 +25,8 @@ For stakeholders looking to explore what RAD Software Systems offers:
 Each artifact here is built with a focus on Sovereignty—giving the client total control over their data and logic without the "spurious tactics" or bloat found in off-the-shelf solutions.
 
 "We don't just write code; we architect systems that survive the real world."
+
+<h2>Other Relevant Repositories</h2>
+<ol>
+ <li><a href="https://github.com/RAD-AgileDevOps/automotive-dashboard-prototype-excel-reporting#">Automotive Dashboard - Excel Reporting</a></li>
+</ol>
