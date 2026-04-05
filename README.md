@@ -1,8 +1,8 @@
-RAD Software Systems | Technical Artifacts & Proof of Concepts
-The Sovereign Architecture Lab
+<h1>RAD Software Systems | Technical Artifacts & Proof of Concepts</h1>
+<h2>The Sovereign Architecture Lab</h2>
 This repository serves as a centralized hub for RAD Software Systems' technical DNA. It is a curated collection of production-grade demos, rapid prototypes, and architectural Proof of Concepts (PoCs) designed to demonstrate the intersection of high-performance logic and seamless user experience.
 
-🛠 Tech Stack & Core Competencies
+<h2>🛠 Tech Stack & Core Competencies</h2>
 We specialize in the VILT Stack (Vue, Inertia, Laravel, Tailwind) and robust backend engineering. This repo showcases our mastery in:
 
 Full-Stack Development: Modern, reactive web applications.
@@ -13,7 +13,7 @@ Rapid Prototyping: Moving from PoC to MVP with "Matter-of-Fact" precision.
 
 Automation: Solving complex business anomalies through custom logic.
 
-📂 Repository Contents
+ <h2>📂Repository Contents</h2>
 Demos: Feature-complete modules (Accounting, Payroll, Inventory).
 
 Projects: Components of live systems like TenantFlow CRM.
