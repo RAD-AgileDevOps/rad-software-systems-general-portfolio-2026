@@ -28,5 +28,6 @@ Each artifact here is built with a focus on Sovereignty—giving the client tota
 
 <h2>Other Relevant Repositories</h2>
 <ol>
- <li><a href="https://github.com/RAD-AgileDevOps/automotive-dashboard-prototype-excel-reporting#">Automotive Dashboard - Excel Reporting</a></li>
+    <li><a href="https://github.com/RAD-AgileDevOps/automotive-dashboard-prototype-excel-reporting#">Automotive Dashboard - Excel Reporting</a></li>
+    <li><a href="https://github.com/RAD-AgileDevOps/reactive-event-log">Reactive Event Log</a></li>
 </ol>
