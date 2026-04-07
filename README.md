@@ -4,7 +4,7 @@ This repository serves as a centralized hub for RAD Software Systems' technical 
 
 <h2>Other Relevant Repositories</h2>
 <ol>
-    <li href="https://github.com/RAD-AgileDevOps/phase-one-rad-prototype"> Dating Website project</li>
+    <li><a href="https://github.com/RAD-AgileDevOps/phase-one-rad-prototype">Dating Website project</a> </li>
     <li><a href="https://github.com/RAD-AgileDevOps/automotive-dashboard-prototype-excel-reporting#">Automotive Dashboard - Excel Reporting</a></li>
     <li><a href="https://github.com/RAD-AgileDevOps/reactive-event-log">Reactive Event Log</a></li>
  <li><a href="https://github.com/RAD-AgileDevOps/vilt-pomodoro-timer-project">Pomodoro Timer</a></li>
