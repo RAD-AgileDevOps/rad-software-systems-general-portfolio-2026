@@ -1,10 +1,9 @@
 <h1>RAD Software Systems | Technical Artifacts & Proof of Concepts</h1>
 
-This repository serves as a centralized hub for RAD Software Systems' technical DNA. It is a curated collection of production-grade demos, rapid prototypes, and architectural Proof of Concepts (PoCs) designed to demonstrate the intersection of high-performance logic and seamless user experience.
+<p>This repository serves as a centralized hub for RAD Software Systems' technical DNA. It is a curated collection of production-grade demos, rapid prototypes, and architectural Proof of Concepts (PoCs) designed to demonstrate the intersection of high-performance logic and seamless user experience.</p>
 
 <h2>Other Relevant Repositories</h2>
 <ol>
-    
     <li><a href="https://github.com/RAD-AgileDevOps/automotive-dashboard-prototype-excel-reporting#">Automotive Dashboard - Excel Reporting</a></li>
     <li><a href="https://github.com/RAD-AgileDevOps/reactive-event-log">Reactive Event Log</a></li>
  <li><a href="https://github.com/RAD-AgileDevOps/vilt-pomodoro-timer-project">Pomodoro Timer</a></li>
