@@ -1,5 +1,5 @@
 <h1>RAD Software Systems | Technical Artifacts & Proof of Concepts</h1>
-<h2>The Sovereign Architecture Lab</h2>
+
 This repository serves as a centralized hub for RAD Software Systems' technical DNA. It is a curated collection of production-grade demos, rapid prototypes, and architectural Proof of Concepts (PoCs) designed to demonstrate the intersection of high-performance logic and seamless user experience.
 
 <h2>Other Relevant Repositories</h2>
