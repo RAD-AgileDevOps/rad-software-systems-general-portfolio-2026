@@ -7,6 +7,7 @@
     <li><a href="https://github.com/RAD-AgileDevOps/automotive-dashboard-prototype-excel-reporting#">Automotive Dashboard - Excel Reporting</a></li>
     <li><a href="https://github.com/RAD-AgileDevOps/reactive-event-log">Reactive Event Log</a></li>
  <li><a href="https://github.com/RAD-AgileDevOps/vilt-pomodoro-timer-project">Pomodoro Timer</a></li>
+    <li><a href="https://github.com/RAD-AgileDevOps/double-entry-accounting-php-trait">Acculedger Trait - double entry enforcement</a>></li>
 </ol>
 
 
