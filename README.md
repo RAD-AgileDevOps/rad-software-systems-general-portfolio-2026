@@ -2,14 +2,18 @@
 
 <p>This repository serves as a centralized hub for RAD Software Systems' technical DNA. It is a curated collection of production-grade demos, rapid prototypes, and architectural Proof of Concepts (PoCs) designed to demonstrate the intersection of high-performance logic and seamless user experience.</p>
 
-<h2>Other Relevant Repositories</h2>
+ <h2>📂Repository Contents</h2>
+Demos: Feature-complete modules (Accounting, Payroll, Inventory).
+
+Projects: Components of live systems like TenantFlow CRM.
+
+PoCs: Experimental logic, such as the Reactive Event Log, demonstrating real-time data handling.
 <ol>
     <li><a href="https://github.com/RAD-AgileDevOps/automotive-dashboard-prototype-excel-reporting#">Automotive Dashboard - Excel Reporting</a></li>
     <li><a href="https://github.com/RAD-AgileDevOps/reactive-event-log">Reactive Event Log</a></li>
  <li><a href="https://github.com/RAD-AgileDevOps/vilt-pomodoro-timer-project">Pomodoro Timer</a></li>
     <li><a href="https://github.com/RAD-AgileDevOps/double-entry-accounting-php-trait">Acculedger Trait - double entry enforcement</a>></li>
 </ol>
-
 
 <h2>🛠 Tech Stack & Core Competencies</h2>
 We specialize in the VILT Stack (Vue, Inertia, Laravel, Tailwind) and robust backend engineering. This repo showcases our mastery in:
@@ -21,13 +25,6 @@ Systems Architecture: Scalable SQL schemas and API design.
 Rapid Prototyping: Moving from PoC to MVP with "Matter-of-Fact" precision.
 
 Automation: Solving complex business anomalies through custom logic.
-
- <h2>📂Repository Contents</h2>
-Demos: Feature-complete modules (Accounting, Payroll, Inventory).
-
-Projects: Components of live systems like TenantFlow CRM.
-
-PoCs: Experimental logic, such as the Reactive Event Log, demonstrating real-time data handling.
 
 🎯 Stakeholder Value
 For stakeholders looking to explore what RAD Software Systems offers:
