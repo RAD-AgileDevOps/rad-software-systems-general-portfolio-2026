@@ -13,6 +13,8 @@ PoCs: Experimental logic, such as the Reactive Event Log, demonstrating real-tim
     <li><a href="https://github.com/RAD-AgileDevOps/reactive-event-log">Reactive Event Log</a></li>
  <li><a href="https://github.com/RAD-AgileDevOps/vilt-pomodoro-timer-project">Pomodoro Timer</a></li>
     <li><a href="https://github.com/RAD-AgileDevOps/double-entry-accounting-php-trait">Acculedger Trait - double entry enforcement</a></li>
+
+ <li > <a href="https://github.com/RAD-AgileDevOps/excel-course-for-external-stakeholders">Free MS Excel Tutorial - YouTube</a></li>
 </ol>
 
 <h2>🛠 Tech Stack & Core Competencies</h2>
